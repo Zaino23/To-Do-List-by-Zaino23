@@ -1,0 +1,191 @@
+<html>
+  <head>
+    <title>To-Do List</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <style>
+      body {
+        background-color: turquoise;
+        font-family: arial;
+      }
+      #welcome {
+        color: white;
+        -webkit-text-stroke: 2px black;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }   
+      #create {
+        color: white;
+        border: 1px solid white;
+        border-radius: 5px;
+        font-size: 15px;
+        background-color: red;
+        padding: 5px;
+        cursor: pointer;
+      }
+      #ToDoBox {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        width: 300px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        text-align: center;
+      }
+      #app {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+      }
+      .list{
+        padding: 0px;
+      }
+      li{
+        background-color: hsl(0 , 0% , 75.67%);
+        border-radius: 15px;
+        text-align: left;
+        position: relative;
+        padding: 5px;
+        padding-right: 40px; /* space for X button */
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .reset{
+        text-align: right;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 5px;
+        margin-left: 5px;
+        cursor: pointer;
+      }
+      .delBtn{
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #author{
+        text-align: right;
+      }
+    </style>
+  </head>
+
+  <body>  
+    <div id="app">
+      <div id="ToDoBox">
+
+        <h1 id="welcome">To-Do List</h1>
+        <button class="reset" onclick="C();">C</button>
+        <input type="text" class="input" id="input" placeholder="Enter a task . . ." autocomplete="off" required maxlength="32">
+        <button id="create" onclick="renderTask();">Add</button>
+
+        <h4 id="left"></h4>
+
+        <ul class="list" type="none" tabindex="0"></ul>
+
+      </div>
+    </div>  
+
+    <h4 id="author">Made by Zain</h4>
+  
+    <script>
+      let list = document.querySelector('.list');
+      const left = document.getElementById('left');
+      let input = document.getElementById('input');
+      let count = 0;
+
+      document.addEventListener('DOMContentLoaded', loadTasks);
+
+      input.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+          renderTask();
+        }
+      });
+
+      document.addEventListener('keydown', function(event) {
+        if (event.key === "Delete") {
+          C();
+        }
+      });
+
+      function renderTask(taskText) {
+        let task = taskText || input.value.trim();
+        if (!task) return;
+
+        count++;
+        updateCount();
+
+        let creatTask = document.createElement('li');
+        creatTask.textContent = task; // text on the left
+
+        // simple checkbox next to X
+        let checkBox = document.createElement('input');
+        checkBox.type = 'checkbox';
+        checkBox.classList.add('checkbox');
+
+        let delBtn = document.createElement('button');
+        delBtn.textContent = 'X';
+        delBtn.classList.add('delBtn');
+
+        delBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          creatTask.remove();
+          count--;
+          updateCount();
+          saveTasks();
+        });
+
+        // order: [text (left)] [checkbox] [X (absolute right)]
+        creatTask.appendChild(checkBox);
+        creatTask.appendChild(delBtn);
+        list.appendChild(creatTask);
+
+        input.value = '';
+        input.focus();
+
+        saveTasks();
+      }
+
+      function saveTasks() {
+        let items = document.querySelectorAll("li");
+        let tasks = [];
+
+        items.forEach(li => {
+          // firstChild is the text node with the task
+          tasks.push(li.firstChild.textContent.trim());
+        });
+
+        localStorage.setItem("saves", JSON.stringify(tasks));
+      }
+
+      function loadTasks() {
+        let saved = JSON.parse(localStorage.getItem("saves")) || [];
+
+        saved.forEach(task => {
+          renderTask(task);
+        });
+      }
+
+      function C() {
+        list.innerHTML = '';
+        input.value = '';
+        input.focus();
+        count = 0;
+        updateCount();
+        localStorage.removeItem("saves");
+      }
+
+      function updateCount() {
+        left.innerHTML = `Task(s) left: ${count}`;
+      }
+    </script>
+  </body>
+</html>
+w
