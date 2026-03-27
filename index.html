@@ -21,6 +21,20 @@
         padding: 5px;
         cursor: pointer;
       }
+      #create:hover{
+        background-color: hsl(0, 71%, 45.99%);
+        transform: scale(1.123456789);
+      }
+      #create:disabled:hover {
+        transform: none;
+        cursor: not-allowed;
+      }
+      #create:disabled{
+        opacity: 0.6;
+        background-color: hsl(0, 71%, 45.99%); 
+        transform: none;
+        cursor: not-allowed;
+      }
       #ToDoBox {
         background: white;
         padding: 30px;
@@ -32,7 +46,7 @@
       #app {
       display: flex;
       justify-content: center;
-      padding-top: 40px; /* keeps it nicely placed */
+      padding-top: 40px; 
       }
 
 
@@ -53,15 +67,37 @@
         align-items: center;
         justify-content: space-between;
       }
+      li:hover{
+        font-size: 105%;
+        background-color: hsl(0 , 0% , 80.80%);
+      }
       .reset{
         text-align: right;
-        background-color: red;
+        background-color: hsl(0, 100%, 50%);
         color: white;
         border: none;
         border-radius: 3px;
         padding: 5px;
         margin-left: 5px;
         cursor: pointer;
+      }
+      .reset:hover{
+        background-color: hsl(0, 71%, 45.99%);
+        border-radius: 3px;
+        transform: scale(1.1);
+      }
+      .reset:disabled:hover{
+        opacity: 0.6;
+        background-color: hsl(0, 71%, 45.99%); 
+        transform: none;
+        cursor: not-allowed;
+      }
+      .reset:disabled{
+        opacity: 0.6;
+        background-color: hsl(0, 71%, 45.99%); 
+        transform: none;
+        cursor: not-allowed;
+
       }
       .delBtn{
         position: absolute;
@@ -74,18 +110,36 @@
         border-radius: 4px;
         cursor: pointer;
       }
+      .delBtn:hover{
+        font-size: 101%;
+      }
       #author{
        position: fixed;
        bottom: 10px;
        right: 10px;
        margin: 0;
-
-
+      }
+      #author:hover{
+        transform: scale(1.123);
+        text-decoration: wavy;
       }
       .checkbox{
         margin-right: 5px;
         width: 30px;
-        height: 15;
+        height: 15px;
+      }
+      .checkbox:hover{
+        margin-right: 6px;
+        transform: scale(1.23456789);
+      }
+      .input:hover{
+        transform: scale(1.023456789999999999999999999999);
+      }
+      #left{
+        scale: 1.1;
+      }
+      #left:hover{
+        transform: scale(1.123456789);
       }
     </style>
   </head>
@@ -95,9 +149,9 @@
       <div id="ToDoBox">
 
         <h1 id="welcome">To-Do List</h1>
-        <button class="reset" onclick="C();">C</button>
-        <input type="text" class="input" id="input" placeholder="Enter a task . . ." autocomplete="off" required maxlength="32">
-        <button id="create" onclick="renderTask();">Add</button>
+        <button class="reset" onclick="C();" disabled>C</button>
+        <input type="text" class="input" id="input" placeholder="Enter a task . . ." autocomplete="off" required maxlength="26">
+        <button id="create" onclick="renderTask();" disabled>Add</button>
 
         <h4 id="left"></h4>
 
@@ -113,7 +167,8 @@
       const left = document.getElementById('left');
       let input = document.getElementById('input');
       let count = 0;
-
+      let addBtn = document.getElementById('create');
+      let clear = document.querySelector('.reset');
       document.addEventListener('DOMContentLoaded', loadTasks);
 
       input.addEventListener('keydown', function(event) {
@@ -123,10 +178,18 @@
       });
 
       document.addEventListener('keydown', function(event) {
-        if (event.key === "Delete") {
+        if (event.key === "Delete" && clear.disabled === false) {
           C();
         }
       });
+
+      input.addEventListener('input', () => {
+        if (input.value.length > 0) {
+          addBtn.disabled = false;
+        } else {
+          addBtn.disabled = true;
+        };
+      })
 
       function renderTask(taskText) {
         let task = taskText || input.value.trim();
@@ -156,10 +219,8 @@
             updateCount();
             saveTasks();
           }
+          checkForTasks()
         });
-      
-      
-      
 
         checkBox.addEventListener('click', () => {
         if (checkBox.checked) {
@@ -178,8 +239,10 @@
         list.appendChild(creatTask);
 
         input.value = '';
+        input.dispatchEvent(new Event('input'));
         input.focus();
 
+        checkForTasks();
         saveTasks();
       }
 
@@ -210,10 +273,21 @@
         count = 0;
         updateCount();
         localStorage.removeItem("saves");
+        checkForTasks()
+        input.dispatchEvent(new Event('input'));
       }
 
       function updateCount() {
         left.innerHTML = `Task(s) left: ${count}`;
+      }
+
+      function checkForTasks() {
+        let hasTasks = document.querySelectorAll("li").length > 0;
+        if (hasTasks) {
+          clear.disabled = false;
+        }else {
+          clear.disabled = true;
+        }
       }
     </script>
   </body>
